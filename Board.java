@@ -1,5 +1,10 @@
+import java.util.List;
+
 public class Board {
-    final private Piece[][] board = new Piece[8][8];
+    private final Piece[][] board;
+
+    private Cell whiteKingPos;
+    private Cell blackKingPos;
 
     public boolean cellIsEmpty(Cell cell){
         return board[cell.row()][cell.col()] == null;
@@ -15,10 +20,23 @@ public class Board {
                 Piece curPiece = getPiece(curPos);
                 if (curPiece != null
                         && curPiece.getColor() == oponentColor){
-                    // bug when we go in pawn attacked cell
+                    List<Cell> attacked =
+                            curPiece.getAttackedCells(curPos, this);
+                    if (attacked.contains(kingPos)){
+                        return true;
+                    }
                 }
             }
         }
+        return false;
+    }
+
+    public boolean checkKingsThread(Color oponentColor){
+        Cell kingPos = (
+                oponentColor == Color.white ?
+                        blackKingPos : whiteKingPos
+                );
+        return checkKingsThread(kingPos, oponentColor);
     }
 
     private static class ClassicFiller extends BoardFiller{
@@ -61,9 +79,24 @@ public class Board {
     }
 
     public Board(GameType gameType){
+        this.board = new Piece[8][8];
         if (gameType == GameType.classic){
             ClassicFiller filler = new ClassicFiller();
             filler.fillPieces(board);
+            whiteKingPos = new Cell(0, 4);
+            blackKingPos = new Cell(7, 4);
         }
+    }
+
+    private Board(Piece[][] board){
+        this.board = board;
+    }
+
+    public Board makeMove(Move move){
+        Piece[][] newBoard = board;
+        Piece piece = newBoard[move.start().row()][move.start().col()];
+        newBoard[move.start().row()][move.start().col()] = null;
+        newBoard[move.finish().row()][move.finish().col()] = piece;
+        return new Board(newBoard);
     }
 }

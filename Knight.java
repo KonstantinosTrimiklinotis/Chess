@@ -7,86 +7,90 @@ public class Knight extends Piece{
         super(color);
     }
 
-    private List<Cell> forwardMoves(Cell start){
-        ArrayList<Cell> moves = new ArrayList<>();
+    private List<Move> forwardMoves(Cell start){
+        ArrayList<Move> moves = new ArrayList<>();
         if (start.row() < 6){
             if (start.col() > 0){
-                moves.add(new Cell(
+                Cell finish = new Cell(
                         start.row() + 2, start.col() - 1
-                ));
+                );
+                moves.add(new Move(start, finish));
             }
             if (start.col() < 7){
-                moves.add(new Cell(
+                Cell finish = new Cell(
                         start.row() + 2, start.col() + 1
-                ));
+                );
+                moves.add(new Move(start, finish));
             }
         }
         return moves;
     }
 
-    private List<Cell> backwardMoves(Cell start){
-        ArrayList<Cell> moves = new ArrayList<>();
+    private List<Move> backwardMoves(Cell start){
+        ArrayList<Move> moves = new ArrayList<>();
         if (start.row() > 1){
             if (start.col() > 0){
-                moves.add(new Cell(
+                Cell finish = new Cell(
                         start.row() - 2, start.col() - 1
-                ));
+                );
+                moves.add(new Move(start, finish));
             }
             if (start.row() < 7){
-                moves.add(new Cell(
+                Cell finish = new Cell(
                         start.row() - 2, start.col() + 1
-                ));
+                );
+                moves.add(new Move(start, finish));
             }
         }
         return moves;
     }
 
-    private List<Cell> leftwardMoves(Cell start){
-        ArrayList<Cell> moves = new ArrayList<>();
+    private List<Move> leftwardMoves(Cell start){
+        ArrayList<Move> moves = new ArrayList<>();
         if (start.col() > 1){
             if (start.row() > 0){
-                moves.add(new Cell(
+                Cell finish = new Cell(
                         start.row() - 1, start.col() - 2
-                ));
+                );
+                moves.add(new Move(start, finish));
             }
             if (start.row() < 7){
-                moves.add(new Cell(
+                Cell finish = new Cell(
                         start.row() + 1, start.col() - 2
-                ));
+                );
+                moves.add(new Move(start, finish));
             }
         }
         return moves;
     }
 
-    private List<Cell> rightwardMoves(Cell start){
-        ArrayList<Cell> moves = new ArrayList<>();
+    private List<Move> rightwardMoves(Cell start){
+        ArrayList<Move> moves = new ArrayList<>();
         if (start.col() < 6){
             if (start.row() > 0){
-                moves.add(new Cell(
+                Cell finish = new Cell(
                         start.row() - 1, start.col() + 2
-                ));
+                );
+                moves.add(new Move(start, finish));
             }
             if (start.row() < 7){
-                moves.add(new Cell(
+                Cell finish = new Cell(
                         start.row() + 1, start.col() + 2
-                ));
+                );
+                moves.add(new Move(start, finish));
             }
         }
         return moves;
     }
 
     @Override
-    public List<Cell> getMoves(Cell start, Board board) {
-        ArrayList<Cell> moves = new ArrayList<>();
+    public List<Move> getMoves(Cell start, Board board) {
+        ArrayList<Move> moves = new ArrayList<>();
         moves.addAll(forwardMoves(start));
         moves.addAll(backwardMoves(start));
         moves.addAll(leftwardMoves(start));
         moves.addAll(rightwardMoves(start));
+        moves.removeIf(move -> dangerousForKingMove(move, board));
         return moves;
-    }
-
-    @Override
-    public boolean checkMove(Cell start, Cell finish, Board board) {
-        return getMoves(start, board).contains(finish);
     }
 }
