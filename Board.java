@@ -6,6 +6,8 @@ public class Board {
     private Cell whiteKingPos;
     private Cell blackKingPos;
 
+    BoardFiller filler;
+
     public boolean cellIsEmpty(Cell cell){
         return board[cell.row()][cell.col()] == null;
     }
@@ -21,7 +23,7 @@ public class Board {
                 if (curPiece != null
                         && curPiece.getColor() == oponentColor){
                     List<Cell> attacked =
-                            curPiece.getAttackedCells(curPos, this);
+                            curPiece.getAttackedCells(curPos, this, null);
                     if (attacked.contains(kingPos)){
                         return true;
                     }
@@ -43,6 +45,10 @@ public class Board {
 
         @Override
         protected void fillRooks(Piece[][] board) {
+            startWhiteLeftRook = new Cell(0, 0);
+            startWhiteRightRook = new Cell(0, 7);
+            startBlackLeftRook = new Cell(7, 0);
+            startBlackRightRook = new Cell(7, 7);
             board[0][0] = new Rook(Color.white);
             board[0][7] = new Rook(Color.white);
             board[7][0] = new Rook(Color.black);
@@ -73,6 +79,8 @@ public class Board {
 
         @Override
         protected void fillKings(Piece[][] board) {
+            startWhiteKingPos = new Cell(0, 4);
+            startBlackKingPos = new Cell(7, 4);
             board[0][4] = new King(Color.white);
             board[7][4] = new King(Color.black);
         }
@@ -81,10 +89,10 @@ public class Board {
     public Board(GameType gameType){
         this.board = new Piece[8][8];
         if (gameType == GameType.classic){
-            ClassicFiller filler = new ClassicFiller();
+            filler = new ClassicFiller();
             filler.fillPieces(board);
-            whiteKingPos = new Cell(0, 4);
-            blackKingPos = new Cell(7, 4);
+            whiteKingPos = filler.startWhiteKingPos;
+            blackKingPos = filler.startBlackKingPos;
         }
     }
 
@@ -98,5 +106,21 @@ public class Board {
         newBoard[move.start().row()][move.start().col()] = null;
         newBoard[move.finish().row()][move.finish().col()] = piece;
         return new Board(newBoard);
+    }
+
+    public List<Cell> getStartCellsWhiteRooks(){
+        return filler.getStartCellsWhiteRooks();
+    }
+
+    public List<Cell> getStartCellsBlackRooks(){
+        return filler.getStartCellsBlackRooks();
+    }
+
+    public Cell getStartCellWhiteKings(){
+        return filler.getStartCellWhiteKings();
+    }
+
+    public Cell getStartCellBlackKings(){
+        return filler.getStartCellBlackKings();
     }
 }

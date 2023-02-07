@@ -12,10 +12,10 @@ public class Queen extends Piece {
     }
 
     @Override
-    public List<Move> getMoves(Cell start, Board board) {
+    public List<Move> getMoves(Cell start, Board board, GameLog gameLog) {
         ArrayList<Move> moves = new ArrayList<>();
-        moves.addAll(rook.getMoves(start, board));
-        moves.addAll(bishop.getMoves(start, board));
+        moves.addAll(rook.getMoves(start, board, null));
+        moves.addAll(bishop.getMoves(start, board, null));
         moves.removeIf(move -> dangerousForKingMove(move, board));
         return moves;
     }

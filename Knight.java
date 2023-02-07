@@ -84,7 +84,7 @@ public class Knight extends Piece{
     }
 
     @Override
-    public List<Move> getMoves(Cell start, Board board) {
+    public List<Move> getMoves(Cell start, Board board, GameLog gameLog) {
         ArrayList<Move> moves = new ArrayList<>();
         moves.addAll(forwardMoves(start));
         moves.addAll(backwardMoves(start));

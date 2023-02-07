@@ -8,8 +8,8 @@ public class Pawn extends Piece{
     }
 
     @Override
-    public List<Cell> getAttackedCells(Cell pos, Board board){
-        List<Move> moves = takeMove(pos, board, false);
+    public List<Cell> getAttackedCells(Cell pos, Board board, GameLog gameLog){
+        List<Move> moves = takeMove(pos, board, false, gameLog);
         List<Cell> attackedCells = new ArrayList<>();
         for (Move move : moves){
             attackedCells.add(move.finish());
@@ -27,8 +27,26 @@ public class Pawn extends Piece{
         );
     }
 
+    private boolean enPassantPossibility(Cell start,
+                                              Board board, boolean left,
+                                              GameLog gameLog){
+        Color ourColor = board.getPiece(start).getColor();
+        int enPassantRow = (ourColor == Color.white ? 4 : 3);
+        if (start.row() != enPassantRow){
+            return false;
+        }
+        int col = (left ? start.col() - 1 : start.col() + 1);
+        int opRow = (ourColor == Color.white ?
+                start.row() + 2 : start.row() - 2);
+        Cell adjacent = new Cell(start.row(), col);
+        Cell opPrev = new Cell(opRow, col);
+
+        return (board.getPiece(adjacent) instanceof Pawn
+            && gameLog.isLastMove(new Move(opPrev, adjacent)));
+    }
+
     private List<Move> takeMove(Cell start,
-                              Board board, boolean isMove){
+                              Board board, boolean isMove, GameLog gameLog){
         ArrayList<Move> moves = new ArrayList<>();
         int forwardRow = (color == Color.white ?
                 start.row() + 1 : start.row() - 1);
@@ -36,7 +54,8 @@ public class Pawn extends Piece{
         if (start.col() > 0){
             Cell finish = new Cell(forwardRow, start.col() - 1);
             if (isMove){
-                if(!board.cellIsEmpty(finish)){
+                if(!board.cellIsEmpty(finish)
+                        || enPassantPossibility(start, board, true, gameLog)){
                     moves.add(new Move(start, finish));
                 }
             }
@@ -48,7 +67,8 @@ public class Pawn extends Piece{
             Cell finish = new Cell(forwardRow, start.col() + 1);
             if (isMove){
                 if (!board.cellIsEmpty(
-                        new Cell(forwardRow, start.col() + 1))){
+                        new Cell(forwardRow, start.col() + 1))
+                        || enPassantPossibility(start, board, false, gameLog)){
                     moves.add(new Move(start, finish));
                 }
             }
@@ -60,10 +80,10 @@ public class Pawn extends Piece{
     }
 
     @Override
-    public List<Move> getMoves(Cell start, Board board) {
+    public List<Move> getMoves(Cell start, Board board, GameLog gameLog) {
         ArrayList<Move> moves = new ArrayList<>();
         moves.addAll(forwardMove(start, board));
-        moves.addAll(takeMove(start, board, true));
+        moves.addAll(takeMove(start, board, true, gameLog));
         moves.removeIf(move -> dangerousForKingMove(move, board));
         return moves;
     }

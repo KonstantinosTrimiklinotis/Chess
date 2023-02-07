@@ -54,7 +54,7 @@ public class Rook extends Piece{
         return moves;
     }
     @Override
-    public List<Move> getMoves(Cell start, Board board) {
+    public List<Move> getMoves(Cell start, Board board, GameLog gameLog) {
         ArrayList<Move> moves = new ArrayList<>();
         moves.addAll(forwardMoves(start, board));
         moves.addAll(backwardMoves(start, board));

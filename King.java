@@ -48,8 +48,50 @@ public class King extends Piece{
         return moves;
     }
 
+    private boolean checkKingsSafetyCastling(Cell start,
+                                             Board board,
+                                             boolean longCastle){
+        Color color = board.getPiece(start).getColor();
+        Color opColor = (color == Color.white ?
+                Color.black : Color.white);
+        Cell[] cells = new Cell[2];
+        if (longCastle){
+            cells[0] = new Cell(start.row(), start.col() - 1);
+            cells[1] = new Cell(start.row(), start.col() - 2);
+        }
+        else{
+            cells[0] = new Cell(start.row(), start.col() + 1);
+            cells[1] = new Cell(start.row(), start.col() + 2);
+        }
+        return board.checkKingsThread(cells[0], opColor)
+                && board.checkKingsThread(cells[1], opColor);
+    }
+
+    private List<Move> castle(Cell start, Board board, GameLog gameLog){
+        List<Move> moves = new ArrayList<>();
+        Color color = board.getPiece(start).getColor();
+        Cell king = (color == Color.white ?
+                board.getStartCellWhiteKings() : board.getStartCellBlackKings());
+        if (gameLog.hasMovedFrom(king)){
+            return moves;
+        }
+        List<Cell> rooks = (color == Color.white ?
+                board.getStartCellsWhiteRooks() : board.getStartCellsBlackRooks());
+        if (!gameLog.hasMovedFrom(rooks.get(0))
+                && checkKingsSafetyCastling(start, board, true)){
+            Cell kingLeftMove = new Cell(start.row(), start.col() - 2);
+            moves.add(new Move(start, kingLeftMove));
+        }
+        if (!gameLog.hasMovedFrom(rooks.get(1))
+                && checkKingsSafetyCastling(start, board, false)){
+            Cell kingRightMove = new Cell(start.row(), start.col() + 2);
+            moves.add(new Move(start, kingRightMove));
+        }
+        return moves;
+    }
+
     @Override
-    public List<Cell> getAttackedCells(Cell start, Board board){
+    public List<Cell> getAttackedCells(Cell start, Board board, GameLog gameLog){
         ArrayList<Cell> moves = new ArrayList<>();
         moves.addAll(crossMoves(start));
         moves.addAll(diagonalMoves(start));
@@ -57,8 +99,8 @@ public class King extends Piece{
     }
 
     @Override
-    public List<Move> getMoves(Cell start, Board board) {
-        List<Cell> attackedCells = getAttackedCells(start, board);
+    public List<Move> getMoves(Cell start, Board board, GameLog gameLog) {
+        List<Cell> attackedCells = getAttackedCells(start, board, gameLog);
         Color opponentColor = (
                 board.getPiece(start).getColor() == Color.white
                         ? Color.black : Color.white);
@@ -67,6 +109,7 @@ public class King extends Piece{
         for (Cell attackedCell : attackedCells){
             moves.add(new Move(start, attackedCell));
         }
+        moves.addAll(castle(start, board, gameLog));
         return moves;
     }
 }

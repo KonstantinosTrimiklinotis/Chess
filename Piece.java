@@ -4,18 +4,18 @@ import java.util.List;
 public abstract class Piece {
     protected Color color;
 
-    public List<Cell> getAttackedCells(Cell pos, Board board){
+    public List<Cell> getAttackedCells(Cell pos, Board board, GameLog gameLog){
         List<Cell> cells = new ArrayList<>();
-        for (Move move : getMoves(pos, board)){
+        for (Move move : getMoves(pos, board, gameLog)){
             cells.add(move.finish());
         }
         return cells;
     }
 
-    abstract public List<Move> getMoves(Cell start, Board board);
+    abstract public List<Move> getMoves(Cell start, Board board, GameLog gameLog);
     public boolean checkMove(Move move,
-                             Board board){
-        return getMoves(move.start(), board).contains(move);
+                             Board board, GameLog gameLog){
+        return getMoves(move.start(), board, gameLog).contains(move);
     }
     Piece(Color color){
         this.color = color;

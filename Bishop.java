@@ -63,7 +63,7 @@ public class Bishop extends Piece{
     }
 
     @Override
-    public List<Move> getMoves(Cell start, Board board) {
+    public List<Move> getMoves(Cell start, Board board, GameLog gameLog) {
         ArrayList<Move> moves = new ArrayList<>();
         moves.addAll(upperLeftDiagonal(start, board));
         moves.addAll(upperRightDiagonal(start, board));
