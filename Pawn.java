@@ -12,7 +12,7 @@ public class Pawn extends Piece{
         List<Move> moves = takeMove(pos, board, false, gameLog);
         List<Cell> attackedCells = new ArrayList<>();
         for (Move move : moves){
-            attackedCells.add(move.finish());
+            attackedCells.add(move.getFinish());
         }
         return attackedCells;
     }

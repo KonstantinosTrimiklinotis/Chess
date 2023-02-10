@@ -7,7 +7,7 @@ public class GameLog {
     final private List<Move> gameLog = new ArrayList<>();
     final private Map<Cell, Boolean> hasMovedFrom = new HashMap<>();
     public void addMove(Move move){
-        hasMovedFrom.put(move.start(), true);
+        hasMovedFrom.put(move.getStart(), true);
         gameLog.add(move);
     }
 

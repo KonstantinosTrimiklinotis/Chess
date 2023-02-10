@@ -100,12 +100,41 @@ public class Board {
         this.board = board;
     }
 
-    public Board makeMove(Move move){
+    private void movePiece(Move move, Piece[][] board){
+        Piece piece = board[move.getStart().row()][move.getStart().col()];
+        board[move.getStart().row()][move.getStart().col()] = null;
+        board[move.getFinish().row()][move.getFinish().col()] = piece;
+    }
+
+    private Board specialMoveHandler(Move move){
+        SpecialMove specMove = (SpecialMove) (move);
         Piece[][] newBoard = board;
-        Piece piece = newBoard[move.start().row()][move.start().col()];
-        newBoard[move.start().row()][move.start().col()] = null;
-        newBoard[move.finish().row()][move.finish().col()] = piece;
+        if (specMove instanceof PawnPromotion){
+            Piece piece = ((PawnPromotion)(specMove)).getTransformedPiece();
+            newBoard[move.getStart().row()][move.getStart().col()] = null;
+            newBoard[move.getFinish().row()][move.getFinish().col()] = piece;
+        }
+        else {
+            int rookShift = (specMove instanceof LongCastle) ? 1 : -1;
+            Cell rookStartPos = ((Castle) (specMove)).getRookPos();
+            Cell rookFinishPos = new Cell(move.getFinish().row(),
+                    move.getFinish().col() + rookShift);
+            Move rookMove = new Move(rookStartPos, rookFinishPos);
+            movePiece(move, newBoard);
+            movePiece(rookMove, newBoard);
+        }
         return new Board(newBoard);
+    }
+
+    public Board makeMove(Move move){
+        if (!(move instanceof SpecialMove)) {
+            Piece[][] newBoard = board;
+            movePiece(move, newBoard);
+            return new Board(newBoard);
+        }
+        else{
+            return specialMoveHandler(move);
+        }
     }
 
     public List<Cell> getStartCellsWhiteRooks(){
